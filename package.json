@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "npx nx run-many -t serve -p frontend backend",
+    "dev": "concurrently -k --names \"BACKEND,FRONTEND\" --prefix-colors \"magenta,cyan\" \"npx nx serve backend\" \"npx nx serve frontend\"",
     "dev:frontend": "npx nx serve frontend",
     "dev:backend": "npx nx serve backend",
     "build": "npx nx run-many -t build -p frontend backend",
@@ -13,7 +13,7 @@
     "test:frontend": "npx nx test frontend",
     "test:backend": "npx nx test backend",
     "format": "npx prettier --write .",
-    "install": "npm install"
+    "setup": "npm install"
   },
   "private": true,
   "devDependencies": {
@@ -41,6 +41,7 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/ui": "~4.1.0",
+    "concurrently": "^9.2.1",
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
     "nx": "22.6.5",

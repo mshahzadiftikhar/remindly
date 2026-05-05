@@ -13,26 +13,26 @@ import { UserSettings } from '../../settings/entities/user-settings.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true, length: 255 })
-  email: string;
+  email!: string;
 
   @Column({ name: 'password_hash' })
-  passwordHash: string;
+  passwordHash!: string;
 
-  @Column({ name: 'full_name', length: 100, nullable: true })
-  fullName: string | null;
+  @Column({ name: 'full_name', type: 'varchar', length: 100, nullable: true })
+  fullName!: string | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   @OneToMany(() => Reminder, (reminder) => reminder.user)
-  reminders: Reminder[];
+  reminders!: Reminder[];
 
   @OneToOne(() => UserSettings, (settings) => settings.user)
-  settings: UserSettings;
+  settings!: UserSettings;
 }

@@ -20,23 +20,23 @@ export enum ReminderCategory {
 @Entity('reminders')
 export class Reminder {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ name: 'user_id' })
-  userId: string;
+  userId!: string;
 
   @ManyToOne(() => User, (user) => user.reminders, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user!: User;
 
   @Column({ length: 255 })
-  title: string;
+  title!: string;
 
   @Column({ type: 'enum', enum: ReminderCategory })
-  category: ReminderCategory;
+  category!: ReminderCategory;
 
   @Column({ name: 'expiry_date', type: 'date' })
-  expiryDate: string;
+  expiryDate!: string;
 
   @Column({
     name: 'remind_days_before',
@@ -44,17 +44,17 @@ export class Reminder {
     array: true,
     default: () => "'{30,7,1}'",
   })
-  remindDaysBefore: number[];
+  remindDaysBefore!: number[];
 
   @Column({ nullable: true, type: 'text' })
-  notes: string | null;
+  notes!: string | null;
 
   @Column({ name: 'is_active', default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

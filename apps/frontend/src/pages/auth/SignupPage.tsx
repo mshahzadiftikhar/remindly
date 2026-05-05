@@ -5,6 +5,8 @@ import { AuthLayout } from '../../components/layout/AuthLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import api from '../../lib/api';
+import { useAuth } from '../../lib/auth-context';
+import { User } from '../../lib/types';
 
 interface FormState {
   fullName: string;
@@ -43,6 +45,7 @@ function validate(values: FormState): FormErrors {
 
 export function SignupPage() {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [values, setValues] = useState<FormState>({
     fullName: '',
     email: '',
@@ -75,6 +78,8 @@ export function SignupPage() {
         email: values.email,
         password: values.password,
       });
+      const { data } = await api.get<User>('/auth/me');
+      setUser(data);
       navigate('/dashboard');
     } catch (err) {
       if (axios.isAxiosError(err)) {
