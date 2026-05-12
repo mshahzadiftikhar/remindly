@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +15,8 @@ import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
     private readonly jwt: JwtService,
@@ -22,7 +25,10 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const exists = await this.users.findOne({ where: { email: dto.email } });
-    if (exists) throw new ConflictException('Email already registered');
+    if (exists) {
+      this.logger.warn(`Registration failed — email already in use: ${dto.email}`);
+      throw new ConflictException('Email already registered');
+    }
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = this.users.create({
@@ -31,16 +37,24 @@ export class AuthService {
       fullName: dto.fullName ?? null,
     });
     await this.users.save(user);
+    this.logger.log(`User registered: ${user.email} (id: ${user.id})`);
     return this.toProfile(user);
   }
 
   async login(dto: LoginDto) {
     const user = await this.users.findOne({ where: { email: dto.email } });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      this.logger.warn(`Login failed — no account for: ${dto.email}`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
-    if (!valid) throw new UnauthorizedException('Invalid credentials');
+    if (!valid) {
+      this.logger.warn(`Login failed — wrong password for: ${dto.email}`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
 
+    this.logger.log(`User logged in: ${user.email} (id: ${user.id})`);
     return this.toProfile(user);
   }
 
