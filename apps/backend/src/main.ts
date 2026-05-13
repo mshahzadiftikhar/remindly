@@ -11,7 +11,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter());
-  app.enableCors({ origin: 'http://localhost:4201', credentials: true });
+  app.enableCors({ origin: process.env.CORS_ORIGIN ?? 'http://localhost:4201', credentials: true });
   app.setGlobalPrefix('api');
   const port = process.env.PORT || 3002;
   await app.listen(port);
