@@ -15,11 +15,13 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: 'strict' as const,
-  secure: process.env.NODE_ENV === 'production',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  sameSite: (isProduction ? 'none' : 'strict') as 'none' | 'strict',
+  secure: isProduction,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 @Controller('auth')
