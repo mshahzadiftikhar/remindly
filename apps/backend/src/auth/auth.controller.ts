@@ -8,6 +8,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
@@ -23,6 +24,8 @@ const COOKIE_OPTIONS = {
   secure: isProduction,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
+
+const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:4200';
 
 @Controller('auth')
 export class AuthController {
@@ -63,5 +66,29 @@ export class AuthController {
       fullName: user.fullName,
       createdAt: user.createdAt,
     };
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
+    const token = this.authService.signToken(req.user);
+    res.cookie('access_token', token, COOKIE_OPTIONS);
+    res.redirect(`${FRONTEND_URL}/dashboard`);
+  }
+
+  @Get('microsoft')
+  @UseGuards(AuthGuard('microsoft'))
+  microsoftLogin() {}
+
+  @Get('microsoft/callback')
+  @UseGuards(AuthGuard('microsoft'))
+  microsoftCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
+    const token = this.authService.signToken(req.user);
+    res.cookie('access_token', token, COOKIE_OPTIONS);
+    res.redirect(`${FRONTEND_URL}/dashboard`);
   }
 }

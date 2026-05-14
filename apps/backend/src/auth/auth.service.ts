@@ -48,6 +48,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!user.passwordHash) {
+      this.logger.warn(`Login failed — password login not available for OAuth account: ${dto.email}`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
       this.logger.warn(`Login failed — wrong password for: ${dto.email}`);
@@ -58,12 +63,42 @@ export class AuthService {
     return this.toProfile(user);
   }
 
+  async validateOAuthUser(opts: {
+    provider: 'google' | 'microsoft';
+    providerId: string;
+    email: string;
+    fullName: string | null;
+  }): Promise<User> {
+    const idField = opts.provider === 'google' ? 'googleId' : 'microsoftId';
+    let user = await this.users.findOne({ where: { [idField]: opts.providerId } });
+
+    if (!user) {
+      user = await this.users.findOne({ where: { email: opts.email } });
+      if (user) {
+        user[idField] = opts.providerId;
+        await this.users.save(user);
+        this.logger.log(`Linked ${opts.provider} to existing account: ${opts.email}`);
+      } else {
+        user = this.users.create({
+          email: opts.email,
+          fullName: opts.fullName,
+          passwordHash: null,
+          [idField]: opts.providerId,
+        });
+        await this.users.save(user);
+        this.logger.log(`Created account via ${opts.provider}: ${opts.email}`);
+      }
+    }
+
+    return user;
+  }
+
   signToken(user: User) {
     return this.jwt.sign(
       { sub: user.id, email: user.email },
       {
         secret: this.config.get<string>('JWT_SECRET', 'change-me'),
-        expiresIn: this.config.get<string>('JWT_EXPIRES_IN', '7d'),
+        expiresIn: this.config.get('JWT_EXPIRES_IN', '7d') as unknown as number,
       },
     );
   }

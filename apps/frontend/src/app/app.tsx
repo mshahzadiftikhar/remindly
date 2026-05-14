@@ -7,6 +7,7 @@ import { DashboardPage } from '../pages/DashboardPage';
 import { LandingPage } from '../pages/LandingPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { SettingsPage } from '../pages/SettingsPage';
+import { ComingSoonPage } from '../pages/ComingSoonPage';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { SignupPage } from '../pages/auth/SignupPage';
 import { EditReminderPage } from '../pages/reminders/EditReminderPage';
@@ -20,6 +21,7 @@ export function App() {
           <ToastProvider>
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/coming-soon" element={<ComingSoonPage />} />
               <Route
                 path="/auth/signup"
                 element={
