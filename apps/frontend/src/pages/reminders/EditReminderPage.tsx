@@ -26,7 +26,7 @@ function EditReminderContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-warm-bg">
+      <div className="min-h-screen bg-charcoal dot-grid-dark">
         <AppNavbar />
         <div className="mx-auto max-w-2xl px-4 py-8">
           <ReminderFormSkeleton />
@@ -38,10 +38,10 @@ function EditReminderContent() {
   if (!reminder) return null;
 
   return (
-    <div className="min-h-screen bg-warm-bg">
+    <div className="min-h-screen bg-charcoal dot-grid-dark">
       <AppNavbar />
       <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="font-display text-3xl text-charcoal mb-6">Edit Reminder</h1>
+        <h1 className="font-display text-3xl text-white mb-6">Edit Reminder</h1>
         <ReminderForm reminder={reminder} />
       </main>
     </div>

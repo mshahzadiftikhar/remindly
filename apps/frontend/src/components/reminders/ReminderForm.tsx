@@ -63,14 +63,14 @@ function ProgressBar({ form }: { form: FormState }) {
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-charcoal/35">
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-white/35">
           Form completion
         </span>
-        <span className="text-[11px] font-semibold text-charcoal/40">{pct}%</span>
+        <span className="text-[11px] font-semibold text-white/40">{pct}%</span>
       </div>
-      <div className="h-1.5 rounded-full bg-charcoal/7 overflow-hidden">
+      <div className="h-1.5 rounded-full bg-white/8 overflow-hidden">
         <div
-          className="h-full rounded-full bg-charcoal/70 transition-all duration-500 ease-out"
+          className="h-full rounded-full bg-amber-brand transition-all duration-500 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -139,7 +139,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <Card className="p-6 border-charcoal/8">
+      <Card className="p-6">
         <ProgressBar form={form} />
 
         <div className="space-y-6">
@@ -155,7 +155,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
 
           {/* Category */}
           <div className="flex flex-col gap-2">
-            <label className="text-[13px] font-medium text-charcoal/65">Category</label>
+            <label className="text-[13px] font-medium text-white/65">Category</label>
             <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-5">
               {CATEGORIES.map(({ value, label, icon }) => {
                 const selected = form.category === value;
@@ -168,14 +168,14 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
                       'relative flex flex-col items-center gap-2 rounded-2xl border py-4 px-2 text-[12px] font-semibold',
                       'transition-all duration-150',
                       selected
-                        ? 'border-charcoal/40 bg-charcoal/6 text-charcoal shadow-sm scale-[1.02]'
-                        : 'border-charcoal/10 text-charcoal/45 hover:border-charcoal/18 hover:bg-charcoal/3 hover:scale-[1.01]',
+                        ? 'border-amber-brand/50 bg-amber-brand/12 text-white shadow-sm scale-[1.02]'
+                        : 'border-white/10 text-white/45 hover:border-white/18 hover:bg-white/5 hover:scale-[1.01]',
                     ].join(' ')}
                   >
                     <span className="text-[1.75rem] leading-none">{icon}</span>
                     <span>{label}</span>
                     {selected && (
-                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-charcoal flex items-center justify-center shadow-sm">
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-amber-brand flex items-center justify-center shadow-sm">
                         <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
                           <path d="M1 3L3 5L7 1" stroke="#FDFCF9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
@@ -199,7 +199,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
 
           {/* Remind Me Before */}
           <div className="flex flex-col gap-2">
-            <label className="text-[13px] font-medium text-charcoal/65">Remind me before</label>
+            <label className="text-[13px] font-medium text-white/65">Remind me before</label>
             <div className="flex flex-wrap gap-2">
               {REMIND_OPTIONS.map((day) => {
                 const checked = form.remindDaysBefore.includes(day);
@@ -210,8 +210,8 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
                       'flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-medium',
                       'transition-all duration-150 select-none',
                       checked
-                        ? 'border-charcoal bg-charcoal text-warm-surface shadow-sm'
-                        : 'border-charcoal/12 text-charcoal/45 hover:border-charcoal/20 hover:bg-charcoal/4',
+                        ? 'border-amber-brand bg-amber-brand text-charcoal shadow-sm'
+                        : 'border-white/12 text-white/45 hover:border-white/20 hover:bg-white/5',
                     ].join(' ')}
                   >
                     <input
@@ -233,10 +233,10 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
           {/* Notes */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <label htmlFor="notes" className="text-[13px] font-medium text-charcoal/65">
-                Notes <span className="font-normal text-charcoal/30">(optional)</span>
+              <label htmlFor="notes" className="text-[13px] font-medium text-white/65">
+                Notes <span className="font-normal text-white/30">(optional)</span>
               </label>
-              <span className="text-[11px] text-charcoal/28">{form.notes.length}/500</span>
+              <span className="text-[11px] text-white/28">{form.notes.length}/500</span>
             </div>
             <textarea
               id="notes"
@@ -245,7 +245,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
               placeholder="Any additional details…"
               value={form.notes}
               onChange={(e) => set('notes', e.target.value)}
-              className="w-full resize-none rounded-xl border border-charcoal/14 px-4 py-2.5 text-sm text-charcoal placeholder-charcoal/28 outline-none transition-all duration-150 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15 bg-white"
+              className="w-full resize-none rounded-xl border border-charcoal/14 px-4 py-2.5 text-sm text-charcoal placeholder-charcoal/28 outline-none transition-all duration-150 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15 bg-white disabled:bg-warm-bg disabled:text-charcoal/40"
             />
           </div>
 

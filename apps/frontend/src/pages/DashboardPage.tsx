@@ -30,21 +30,20 @@ interface StatCardProps {
 
 function StatCard({ label, value, Icon, gradient, valueColor, iconBg, iconColor, bottomBorder, trend }: StatCardProps) {
   return (
-    <div className={`relative rounded-2xl border border-[#D4C9B8] shadow-[0_2px_8px_rgba(100,80,40,0.10),_0_8px_32px_rgba(100,80,40,0.08)] ${gradient} p-5 overflow-hidden flex flex-col`}>
+    <div className={`relative rounded-2xl border border-white/8 shadow-[0_2px_16px_rgba(0,0,0,0.25)] ${gradient} p-5 overflow-hidden flex flex-col`}>
       <div className="flex items-start justify-between mb-4">
-        <div className={`h-10 w-10 rounded-xl ${iconBg} flex items-center justify-center shadow-sm`}>
+        <div className={`h-10 w-10 rounded-xl ${iconBg} flex items-center justify-center`}>
           <Icon size={17} className={iconColor} />
         </div>
         {trend && (
-          <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+          <span className="flex items-center gap-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-full">
             <TrendingUp size={9} />
             {trend}
           </span>
         )}
       </div>
       <p className={`text-5xl font-black leading-none tabular ${valueColor} mb-1.5`}>{value}</p>
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-charcoal/38">{label}</p>
-      {/* Colored bottom accent */}
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-white/40">{label}</p>
       <div className={`absolute bottom-0 left-0 right-0 h-[3px] ${bottomBorder}`} />
     </div>
   );
@@ -52,7 +51,7 @@ function StatCard({ label, value, Icon, gradient, valueColor, iconBg, iconColor,
 
 function getContextMessage(reminders: Reminder[]): { text: string; color: string } {
   if (reminders.length === 0) {
-    return { text: "Ready to add your first reminder?", color: 'text-charcoal/40' };
+    return { text: "Ready to add your first reminder?", color: 'text-white/40' };
   }
   const urgent = reminders.filter(r => { const d = getDaysUntil(r.expiryDate); return d >= 0 && d <= 7; }).length;
   const soon = reminders.filter(r => { const d = getDaysUntil(r.expiryDate); return d > 7 && d <= 30; }).length;
@@ -91,22 +90,22 @@ function DashboardContent() {
     {
       key: 'total', label: 'Total reminders', value: reminders.length,
       Icon: ClipboardList,
-      gradient: 'bg-gradient-to-br from-[#FEFCF8] to-[#F5F0E8]',
-      valueColor: 'text-charcoal', iconBg: 'bg-charcoal/8', iconColor: 'text-charcoal/40',
-      bottomBorder: 'bg-charcoal/15',
+      gradient: 'bg-white/5',
+      valueColor: 'text-white', iconBg: 'bg-white/10', iconColor: 'text-white/45',
+      bottomBorder: 'bg-white/20',
     },
     {
       key: 'expiring', label: 'Expiring this month', value: expiringThisMonth,
       Icon: Clock,
-      gradient: 'bg-gradient-to-br from-[#FFFDF5] to-[#FFF4D6]',
-      valueColor: 'text-soon', iconBg: 'bg-soon/10', iconColor: 'text-soon',
+      gradient: 'bg-amber-brand/8',
+      valueColor: 'text-soon', iconBg: 'bg-soon/15', iconColor: 'text-soon',
       bottomBorder: 'bg-soon',
     },
     {
       key: 'active', label: 'Active', value: reminders.filter(r => r.isActive).length,
       Icon: CheckCircle,
-      gradient: 'bg-gradient-to-br from-[#F6FDF8] to-[#E8F8EE]',
-      valueColor: 'text-safe', iconBg: 'bg-safe/10', iconColor: 'text-safe',
+      gradient: 'bg-emerald-500/8',
+      valueColor: 'text-safe', iconBg: 'bg-safe/15', iconColor: 'text-safe',
       bottomBorder: 'bg-safe',
     },
   ];
@@ -114,14 +113,14 @@ function DashboardContent() {
   const ctx = getContextMessage(reminders);
 
   return (
-    <div className="page-bg min-h-screen">
+    <div className="bg-charcoal dot-grid-dark min-h-screen">
       <AppNavbar />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8 pb-28 sm:pb-12">
         {/* Page header */}
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-[1.85rem] text-charcoal leading-snug font-semibold">
+            <h1 className="text-[1.85rem] text-white leading-snug font-semibold">
               Hello, <span className="font-display">{firstName}</span> 👋
             </h1>
             <p className={`mt-1 text-[13px] font-medium ${ctx.color} transition-colors duration-300`}>

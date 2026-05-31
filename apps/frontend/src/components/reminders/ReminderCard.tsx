@@ -64,7 +64,7 @@ function ProgressRing({
         className="absolute inset-0"
       >
         {/* Track */}
-        <circle cx="36" cy="36" r={RADIUS} fill="none" stroke="rgba(26,26,46,0.07)" strokeWidth="4" />
+        <circle cx="36" cy="36" r={RADIUS} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="4" />
         {/* Progress */}
         <circle
           cx="36" cy="36" r={RADIUS}
@@ -116,11 +116,11 @@ export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCa
     <>
       <div
         className={[
-          'group flex flex-col rounded-2xl border border-[#D4C9B8] bg-[#FEFCF8] overflow-hidden',
-          'shadow-[0_2px_8px_rgba(100,80,40,0.10),_0_8px_32px_rgba(100,80,40,0.08)] transition-all duration-200',
-          'hover:-translate-y-1 hover:shadow-[0_4px_20px_rgba(100,80,40,0.15),_0_16px_48px_rgba(100,80,40,0.10)] hover:border-[#C4B5A0]',
+          'group flex flex-col rounded-2xl border border-white/8 bg-white/5 overflow-hidden',
+          'shadow-[0_2px_12px_rgba(0,0,0,0.25)] transition-all duration-200',
+          'hover:-translate-y-1 hover:shadow-[0_4px_24px_rgba(0,0,0,0.35)] hover:border-white/14 hover:bg-white/7',
           'border-l-4', urgencyBorder,
-          isExpired ? 'opacity-55' : '',
+          isExpired ? 'opacity-45' : '',
           isUrgent && reminder.isActive ? 'animate-pulse-border' : '',
         ].join(' ')}
       >
@@ -130,18 +130,18 @@ export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCa
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
                 <span className="text-[1.1rem] leading-none">{cat.icon}</span>
-                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full text-badge-text bg-badge-bg">
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full text-white/55 bg-white/10">
                   {cat.label}
                 </span>
               </div>
-              <h3 className="font-semibold text-[15px] leading-snug mt-2 truncate text-charcoal">
+              <h3 className="font-semibold text-[15px] leading-snug mt-2 truncate text-white">
                 {reminder.title}
               </h3>
             </div>
 
             {/* Expired stamp or urgency status dot */}
             {isExpired ? (
-              <span className="shrink-0 text-[10px] font-bold tracking-wide text-charcoal/40 bg-charcoal/8 border border-charcoal/12 px-2 py-0.5 rounded-full mt-0.5">
+              <span className="shrink-0 text-[10px] font-bold tracking-wide text-white/40 bg-white/8 border border-white/10 px-2 py-0.5 rounded-full mt-0.5">
                 EXPIRED
               </span>
             ) : (
@@ -161,11 +161,11 @@ export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCa
               isSoon={isSoon}
             />
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-charcoal/32 mb-0.5">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35 mb-0.5">
                 {isExpired ? 'Expired' : 'Days remaining'}
               </p>
-              <p className="text-[11px] text-charcoal/35">{isExpired ? 'ago' : 'until expiry'}</p>
-              <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-charcoal/38">
+              <p className="text-[11px] text-white/35">{isExpired ? 'ago' : 'until expiry'}</p>
+              <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-white/38">
                 <Calendar size={10} className="shrink-0" />
                 <span>{formatDate(reminder.expiryDate)}</span>
               </div>
@@ -177,36 +177,36 @@ export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCa
             {sortedDays.slice(0, 3).map((d) => (
               <span
                 key={d}
-                className="rounded-full bg-charcoal/5 border border-charcoal/10 px-3 py-1 text-[11px] font-medium text-charcoal/55"
+                className="rounded-full bg-white/8 border border-white/10 px-3 py-1 text-[11px] font-medium text-white/55"
               >
                 {d === 1 ? '1 day' : `${d} days`} before
               </span>
             ))}
             {sortedDays.length > 3 && (
-              <span className="text-[10px] text-charcoal/32">+{sortedDays.length - 3}</span>
+              <span className="text-[10px] text-white/32">+{sortedDays.length - 3}</span>
             )}
           </div>
 
           {/* Notes */}
           {reminder.notes && (
-            <p className="mt-3 truncate text-[11px] text-charcoal/30 italic leading-snug">
+            <p className="mt-3 truncate text-[11px] text-white/30 italic leading-snug">
               {reminder.notes}
             </p>
           )}
         </div>
 
         {/* Footer actions — always visible on mobile, hover-only on desktop */}
-        <div className="flex items-center justify-end gap-0.5 border-t border-charcoal/6 px-3 py-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
+        <div className="flex items-center justify-end gap-0.5 border-t border-white/6 px-3 py-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
           <button
             onClick={() => navigate(`/reminders/${reminder.id}`)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-charcoal/40 hover:text-charcoal hover:bg-charcoal/5 transition-all duration-150"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-white/40 hover:text-white hover:bg-white/8 transition-all duration-150"
           >
             <Pencil size={12} />
             Edit
           </button>
           <button
             onClick={() => setConfirmOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-charcoal/40 hover:text-danger hover:bg-danger/7 transition-all duration-150"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-white/40 hover:text-danger hover:bg-danger/10 transition-all duration-150"
           >
             <Trash2 size={12} />
             Delete

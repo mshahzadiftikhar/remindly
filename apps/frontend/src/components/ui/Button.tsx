@@ -27,9 +27,9 @@ const variantClasses: Record<Variant, string> = {
     'active:bg-white/14',
   ].join(' '),
   ghost: [
-    'text-charcoal/55',
-    'hover:text-charcoal hover:bg-charcoal/6',
-    'active:bg-charcoal/10',
+    'text-white/45',
+    'hover:text-white hover:bg-white/8',
+    'active:bg-white/12',
   ].join(' '),
   danger: [
     'bg-danger text-white',

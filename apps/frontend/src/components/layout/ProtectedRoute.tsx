@@ -4,9 +4,9 @@ import { useAuth } from '../../lib/auth-context';
 
 function FullPageSpinner() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center bg-charcoal">
       <svg
-        className="h-8 w-8 animate-spin text-indigo-600"
+        className="h-8 w-8 animate-spin text-amber-brand"
         viewBox="0 0 24 24"
         fill="none"
       >
@@ -32,6 +32,6 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) return <FullPageSpinner />;
-  if (!user) return <Navigate to="/auth/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   return <>{children}</>;
 }

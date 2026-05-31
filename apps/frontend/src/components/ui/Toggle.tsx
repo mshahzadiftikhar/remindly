@@ -15,7 +15,7 @@ export function Toggle({ checked, onChange, disabled = false, label }: TogglePro
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-        checked ? 'bg-amber-brand' : 'bg-charcoal/20'
+        checked ? 'bg-amber-brand' : 'bg-white/20'
       }`}
     >
       <span
