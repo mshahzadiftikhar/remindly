@@ -11,11 +11,11 @@ interface ReminderFormProps {
 }
 
 const CATEGORIES: { value: ReminderCategory; label: string; icon: string }[] = [
-  { value: 'document', label: 'Document', icon: '🗂️' },
+  { value: 'document',     label: 'Document',     icon: '🗂️' },
   { value: 'subscription', label: 'Subscription', icon: '📦' },
-  { value: 'warranty', label: 'Warranty', icon: '🔧' },
-  { value: 'insurance', label: 'Insurance', icon: '🛡️' },
-  { value: 'custom', label: 'Custom', icon: '🔔' },
+  { value: 'warranty',     label: 'Warranty',     icon: '🔧' },
+  { value: 'insurance',    label: 'Insurance',    icon: '🛡️' },
+  { value: 'custom',       label: 'Custom',       icon: '🔔' },
 ];
 
 const REMIND_OPTIONS = [1, 3, 7, 14, 30, 60];
@@ -48,13 +48,34 @@ function initState(reminder?: Reminder): FormState {
       notes: reminder.notes ?? '',
     };
   }
-  return {
-    title: '',
-    category: 'document',
-    expiryDate: '',
-    remindDaysBefore: [7],
-    notes: '',
-  };
+  return { title: '', category: 'document', expiryDate: '', remindDaysBefore: [7], notes: '' };
+}
+
+function ProgressBar({ form }: { form: FormState }) {
+  const filled = [
+    !!form.title.trim(),
+    !!form.expiryDate,
+    form.remindDaysBefore.length > 0,
+    !!form.notes.trim(),
+  ].filter(Boolean).length;
+  const pct = Math.round((filled / 4) * 100);
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-charcoal/35">
+          Form completion
+        </span>
+        <span className="text-[11px] font-semibold text-charcoal/40">{pct}%</span>
+      </div>
+      <div className="h-1.5 rounded-full bg-charcoal/7 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-charcoal/70 transition-all duration-500 ease-out"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
 }
 
 export function ReminderForm({ reminder }: ReminderFormProps) {
@@ -80,23 +101,11 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
 
   const validate = (): boolean => {
     const next: FormErrors = {};
-
-    if (!form.title.trim()) {
-      next.title = 'Title is required.';
-    } else if (form.title.trim().length > 100) {
-      next.title = 'Title must be 100 characters or fewer.';
-    }
-
-    if (!form.expiryDate) {
-      next.expiryDate = 'Expiry date is required.';
-    } else if (form.expiryDate < todayISO()) {
-      next.expiryDate = 'Expiry date must be today or in the future.';
-    }
-
-    if (form.remindDaysBefore.length === 0) {
-      next.remindDaysBefore = 'Select at least one reminder interval.';
-    }
-
+    if (!form.title.trim()) next.title = 'Title is required.';
+    else if (form.title.trim().length > 100) next.title = 'Title must be 100 characters or fewer.';
+    if (!form.expiryDate) next.expiryDate = 'Expiry date is required.';
+    else if (form.expiryDate < todayISO()) next.expiryDate = 'Expiry date must be today or in the future.';
+    if (form.remindDaysBefore.length === 0) next.remindDaysBefore = 'Select at least one reminder interval.';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -105,7 +114,6 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
     e.preventDefault();
     setApiError('');
     if (!validate()) return;
-
     setSubmitting(true);
     try {
       const payload = {
@@ -115,13 +123,11 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
         remindDaysBefore: form.remindDaysBefore,
         notes: form.notes.trim() || null,
       };
-
       if (isEdit) {
         await api.patch(`/reminders/${reminder.id}`, payload);
       } else {
         await api.post('/reminders', payload);
       }
-
       navigate('/dashboard');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -133,109 +139,129 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <Card className="space-y-6 p-6">
-        {/* Title */}
-        <Input
-          label="Title"
-          placeholder="e.g. UK Passport"
-          maxLength={101}
-          value={form.title}
-          onChange={(e) => set('title', e.target.value)}
-          error={errors.title}
-        />
+      <Card className="p-6 border-charcoal/8">
+        <ProgressBar form={form} />
 
-        {/* Category */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Category</label>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {CATEGORIES.map(({ value, label, icon }) => (
-              <button
-                key={value}
-                type="button"
-                onClick={() => set('category', value)}
-                className={`flex flex-col items-center gap-1 rounded-xl border py-3 text-xs font-medium transition-colors ${
-                  form.category === value
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                <span className="text-xl">{icon}</span>
-                {label}
-              </button>
-            ))}
+        <div className="space-y-6">
+          {/* Title */}
+          <Input
+            label="Title"
+            placeholder="e.g. UK Passport"
+            maxLength={101}
+            value={form.title}
+            onChange={(e) => set('title', e.target.value)}
+            error={errors.title}
+          />
+
+          {/* Category */}
+          <div className="flex flex-col gap-2">
+            <label className="text-[13px] font-medium text-charcoal/65">Category</label>
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-5">
+              {CATEGORIES.map(({ value, label, icon }) => {
+                const selected = form.category === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => set('category', value)}
+                    className={[
+                      'relative flex flex-col items-center gap-2 rounded-2xl border py-4 px-2 text-[12px] font-semibold',
+                      'transition-all duration-150',
+                      selected
+                        ? 'border-charcoal/40 bg-charcoal/6 text-charcoal shadow-sm scale-[1.02]'
+                        : 'border-charcoal/10 text-charcoal/45 hover:border-charcoal/18 hover:bg-charcoal/3 hover:scale-[1.01]',
+                    ].join(' ')}
+                  >
+                    <span className="text-[1.75rem] leading-none">{icon}</span>
+                    <span>{label}</span>
+                    {selected && (
+                      <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-charcoal flex items-center justify-center shadow-sm">
+                        <svg width="8" height="6" viewBox="0 0 8 6" fill="none">
+                          <path d="M1 3L3 5L7 1" stroke="#FDFCF9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Expiry Date */}
-        <Input
-          label="Expiry Date"
-          type="date"
-          min={todayISO()}
-          value={form.expiryDate}
-          onChange={(e) => set('expiryDate', e.target.value)}
-          error={errors.expiryDate}
-        />
+          {/* Expiry Date */}
+          <Input
+            label="Expiry date"
+            type="date"
+            min={todayISO()}
+            value={form.expiryDate}
+            onChange={(e) => set('expiryDate', e.target.value)}
+            error={errors.expiryDate}
+          />
 
-        {/* Remind Me Before */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-gray-700">Remind Me Before</label>
-          <div className="flex flex-wrap gap-2">
-            {REMIND_OPTIONS.map((day) => {
-              const checked = form.remindDaysBefore.includes(day);
-              return (
-                <label
-                  key={day}
-                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
-                    checked
-                      ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={checked}
-                    onChange={() => toggleRemindDay(day)}
-                  />
-                  {day === 1 ? '1 day' : `${day} days`}
-                </label>
-              );
-            })}
+          {/* Remind Me Before */}
+          <div className="flex flex-col gap-2">
+            <label className="text-[13px] font-medium text-charcoal/65">Remind me before</label>
+            <div className="flex flex-wrap gap-2">
+              {REMIND_OPTIONS.map((day) => {
+                const checked = form.remindDaysBefore.includes(day);
+                return (
+                  <label
+                    key={day}
+                    className={[
+                      'flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-medium',
+                      'transition-all duration-150 select-none',
+                      checked
+                        ? 'border-charcoal bg-charcoal text-warm-surface shadow-sm'
+                        : 'border-charcoal/12 text-charcoal/45 hover:border-charcoal/20 hover:bg-charcoal/4',
+                    ].join(' ')}
+                  >
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={checked}
+                      onChange={() => toggleRemindDay(day)}
+                    />
+                    {day === 1 ? '1 day' : `${day} days`}
+                  </label>
+                );
+              })}
+            </div>
+            {errors.remindDaysBefore && (
+              <p className="text-xs text-danger">{errors.remindDaysBefore}</p>
+            )}
           </div>
-          {errors.remindDaysBefore && (
-            <p className="text-xs text-red-600">{errors.remindDaysBefore}</p>
+
+          {/* Notes */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="notes" className="text-[13px] font-medium text-charcoal/65">
+                Notes <span className="font-normal text-charcoal/30">(optional)</span>
+              </label>
+              <span className="text-[11px] text-charcoal/28">{form.notes.length}/500</span>
+            </div>
+            <textarea
+              id="notes"
+              rows={3}
+              maxLength={500}
+              placeholder="Any additional details…"
+              value={form.notes}
+              onChange={(e) => set('notes', e.target.value)}
+              className="w-full resize-none rounded-xl border border-charcoal/14 px-4 py-2.5 text-sm text-charcoal placeholder-charcoal/28 outline-none transition-all duration-150 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15 bg-white"
+            />
+          </div>
+
+          {apiError && (
+            <p className="rounded-xl bg-danger/6 border border-danger/18 px-4 py-3 text-sm text-danger">
+              {apiError}
+            </p>
           )}
         </div>
-
-        {/* Notes */}
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between">
-            <label htmlFor="notes" className="text-sm font-medium text-gray-700">
-              Notes <span className="font-normal text-gray-400">(optional)</span>
-            </label>
-            <span className="text-xs text-gray-400">{form.notes.length}/500</span>
-          </div>
-          <textarea
-            id="notes"
-            rows={3}
-            maxLength={500}
-            placeholder="Any additional details…"
-            value={form.notes}
-            onChange={(e) => set('notes', e.target.value)}
-            className="w-full resize-none rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-          />
-        </div>
-
-        {apiError && (
-          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{apiError}</p>
-        )}
       </Card>
 
-      <div className="mt-4 flex items-center justify-end gap-3">
+      <div className="mt-5 flex items-center justify-end gap-3">
         <Button type="button" variant="ghost" onClick={() => navigate('/dashboard')}>
           Cancel
         </Button>
-        <Button type="submit" disabled={submitting}>
+        <Button type="submit" disabled={submitting} className="min-w-36">
           {submitting ? (
             <>
               <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -244,11 +270,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
               </svg>
               {isEdit ? 'Saving…' : 'Creating…'}
             </>
-          ) : isEdit ? (
-            'Save changes'
-          ) : (
-            'Create reminder'
-          )}
+          ) : isEdit ? 'Save changes' : 'Create reminder'}
         </Button>
       </div>
     </form>

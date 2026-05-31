@@ -1,10 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-// TODO: replace /coming-soon links with real OAuth URLs once Google/Microsoft credentials are configured
-// Google:    href={`${API_BASE}/auth/google`}
-// Microsoft: href={`${API_BASE}/auth/microsoft`}
 import { AuthLayout } from '../../components/layout/AuthLayout';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -12,25 +8,13 @@ import api from '../../lib/api';
 import { useAuth } from '../../lib/auth-context';
 import { User } from '../../lib/types';
 
-const API_BASE = import.meta.env.VITE_API_URL ?? '/api';
-
-interface FormState {
-  email: string;
-  password: string;
-}
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-}
+interface FormState { email: string; password: string; }
+interface FormErrors { email?: string; password?: string; }
 
 function validate(values: FormState): FormErrors {
   const errors: FormErrors = {};
-  if (!values.email.trim()) {
-    errors.email = 'Email is required';
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-    errors.email = 'Enter a valid email address';
-  }
+  if (!values.email.trim()) errors.email = 'Email is required';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) errors.email = 'Enter a valid email address';
   if (!values.password) errors.password = 'Password is required';
   return errors;
 }
@@ -52,11 +36,7 @@ export function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate(values);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
+    if (Object.keys(validationErrors).length > 0) { setErrors(validationErrors); return; }
     setIsSubmitting(true);
     setServerError('');
     try {
@@ -77,32 +57,34 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-        <p className="text-sm text-gray-500 mt-1">Log in to manage your reminders</p>
+      <div className="mb-7">
+        <h1 className="font-display text-[1.65rem] text-charcoal leading-snug">Welcome back</h1>
+        <p className="text-[13px] text-charcoal/42 mt-1">Sign in to manage your reminders</p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      {/* OAuth buttons */}
+      <div className="flex flex-col gap-2.5 mb-5">
         <Link
           to="/coming-soon"
-          className="flex items-center justify-center gap-3 w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-3 w-full px-4 h-12 rounded-xl border border-[#e0ddd6] bg-white text-[15px] font-medium text-charcoal/70 hover:bg-[#f5f3ef] transition-all duration-150 shadow-sm shadow-charcoal/4"
         >
           <GoogleIcon />
           Continue with Google
         </Link>
         <Link
           to="/coming-soon"
-          className="flex items-center justify-center gap-3 w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          className="flex items-center justify-center gap-3 w-full px-4 h-12 rounded-xl border border-[#e0ddd6] bg-white text-[15px] font-medium text-charcoal/70 hover:bg-[#f5f3ef] transition-all duration-150 shadow-sm shadow-charcoal/4"
         >
           <MicrosoftIcon />
           Continue with Microsoft
         </Link>
       </div>
 
-      <div className="flex items-center gap-3 my-5">
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400">or</span>
-        <div className="flex-1 h-px bg-gray-200" />
+      {/* Divider */}
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex-1 h-px bg-charcoal/8" />
+        <span className="text-[11px] text-charcoal/28 font-medium tracking-wide uppercase">or email</span>
+        <div className="flex-1 h-px bg-charcoal/8" />
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
@@ -115,33 +97,44 @@ export function LoginPage() {
           error={errors.email}
           disabled={isSubmitting}
           autoComplete="email"
+          autoFocus
         />
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Your password"
-          value={values.password}
-          onChange={set('password')}
-          error={errors.password}
-          disabled={isSubmitting}
-          autoComplete="current-password"
-        />
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Your password"
+            value={values.password}
+            onChange={set('password')}
+            error={errors.password}
+            disabled={isSubmitting}
+            autoComplete="current-password"
+          />
+          <div className="flex justify-end">
+            <Link
+              to="/auth/forgot-password"
+              className="text-[12px] text-charcoal/42 hover:text-charcoal/60 transition-colors"
+            >
+              Forgot password?
+            </Link>
+          </div>
+        </div>
 
         {serverError && (
-          <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-xl bg-danger/6 border border-danger/18 px-4 py-3 text-[13px] text-danger">
             {serverError}
           </div>
         )}
 
         <Button type="submit" size="lg" className="w-full mt-1" disabled={isSubmitting}>
-          {isSubmitting ? <><Spinner /> Logging in…</> : 'Log In'}
+          {isSubmitting ? <><Spinner /> Signing in…</> : 'Sign in'}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-[13px] text-charcoal/42">
         Don't have an account?{' '}
-        <Link to="/auth/signup" className="font-medium text-indigo-600 hover:text-indigo-700">
-          Sign up
+        <Link to="/auth/signup" className="font-semibold text-amber-brand hover:text-amber-brand-dark transition-colors">
+          Create one free
         </Link>
       </p>
     </AuthLayout>
@@ -159,7 +152,7 @@ function Spinner() {
 
 function GoogleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
       <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" />
       <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" />
       <path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" />
@@ -170,7 +163,7 @@ function GoogleIcon() {
 
 function MicrosoftIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
       <rect x="0" y="0" width="8.5" height="8.5" fill="#F25022" />
       <rect x="9.5" y="0" width="8.5" height="8.5" fill="#7FBA00" />
       <rect x="0" y="9.5" width="8.5" height="8.5" fill="#00A4EF" />

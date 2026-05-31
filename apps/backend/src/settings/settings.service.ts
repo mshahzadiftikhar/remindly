@@ -12,7 +12,7 @@ export class SettingsService {
     @InjectRepository(UserSettings) private readonly repo: Repository<UserSettings>,
   ) {}
 
-  async getOrCreate(userId: string) {
+  async getOrCreate(userId: string): Promise<UserSettings> {
     const existing = await this.repo.findOne({ where: { userId } });
     if (existing) return existing;
     this.logger.log(`Creating default settings for user ${userId}`);
@@ -20,7 +20,7 @@ export class SettingsService {
     return this.repo.save(settings);
   }
 
-  async update(userId: string, dto: UpdateSettingsDto) {
+  async update(userId: string, dto: UpdateSettingsDto): Promise<UserSettings> {
     const settings = await this.getOrCreate(userId);
     Object.assign(settings, dto);
     const saved = await this.repo.save(settings);

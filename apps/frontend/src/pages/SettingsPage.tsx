@@ -1,3 +1,4 @@
+import { Bell, LogOut, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { AppNavbar } from '../components/layout/AppNavbar';
 import { ProtectedRoute } from '../components/layout/ProtectedRoute';
@@ -9,6 +10,19 @@ import { Toggle } from '../components/ui/Toggle';
 import api from '../lib/api';
 import { useAuth } from '../lib/auth-context';
 import { UserSettings } from '../lib/types';
+
+function SectionLabel({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2.5 mb-5">
+      <div className="w-7 h-7 rounded-lg bg-charcoal/6 flex items-center justify-center">
+        <Icon size={14} className="text-charcoal/50" />
+      </div>
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-charcoal/38">
+        {children}
+      </p>
+    </div>
+  );
+}
 
 function SettingsContent() {
   const { user, logout } = useAuth();
@@ -71,9 +85,9 @@ function SettingsContent() {
 
   if (loadingSettings || !settings) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-warm-bg">
         <AppNavbar />
-        <div className="mx-auto max-w-2xl px-4 py-8">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 py-8">
           <SettingsSkeleton />
         </div>
       </div>
@@ -81,41 +95,44 @@ function SettingsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-warm-bg">
       <AppNavbar />
-      <main className="mx-auto max-w-2xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold text-gray-900">Settings</h1>
+      <main className="mx-auto max-w-2xl px-4 sm:px-6 py-10">
+        {/* Page heading */}
+        <div className="mb-9">
+          <h1 className="font-display text-[1.85rem] text-charcoal">Settings</h1>
+          <p className="text-[13px] text-charcoal/38 mt-1">Manage your account and preferences</p>
+        </div>
 
-        <div className="space-y-6">
-          {/* Profile */}
-          <Card className="p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-              Profile
-            </h2>
-            <div className="divide-y divide-gray-100">
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-gray-500">Name</span>
-                <span className="text-sm font-medium text-gray-900">
+        <div className="space-y-4">
+          {/* ── Profile ── */}
+          <Card className="p-6 border-charcoal/8">
+            <SectionLabel icon={User}>Profile</SectionLabel>
+            <div className="divide-y divide-charcoal/6 rounded-xl overflow-hidden border border-charcoal/7">
+              <div className="flex items-center justify-between px-4 py-3 bg-white">
+                <span className="text-[13px] text-charcoal/42">Name</span>
+                <span className="text-[13px] font-medium text-charcoal">
                   {user?.fullName ?? '—'}
                 </span>
               </div>
-              <div className="flex items-center justify-between py-3">
-                <span className="text-sm text-gray-500">Email</span>
-                <span className="text-sm font-medium text-gray-900">{user?.email}</span>
+              <div className="flex items-center justify-between px-4 py-3 bg-white">
+                <span className="text-[13px] text-charcoal/42">Email</span>
+                <span className="text-[13px] font-medium text-charcoal">{user?.email}</span>
               </div>
             </div>
           </Card>
 
-          {/* Notification Preferences */}
-          <Card className="p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">
-              Notification Preferences
-            </h2>
-            <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Send email reminders</p>
-                  <p className="text-xs text-gray-400">
+          {/* ── Notification Preferences ── */}
+          <Card className="p-6 border-charcoal/8">
+            <SectionLabel icon={Bell}>Notification Preferences</SectionLabel>
+
+            {/* Toggle + email as a single cohesive unit */}
+            <div className="rounded-xl border border-charcoal/8 overflow-hidden">
+              {/* Toggle row */}
+              <div className="flex items-center justify-between gap-4 px-4 py-4 bg-white">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-charcoal">Send email reminders</p>
+                  <p className="text-[12px] text-charcoal/38 mt-0.5">
                     Receive reminders by email before items expire
                   </p>
                 </div>
@@ -129,71 +146,65 @@ function SettingsContent() {
                 />
               </div>
 
+              {/* Conditional email input */}
               {emailEnabled && (
-                <Input
-                  label="Send reminders to this email"
-                  type="email"
-                  placeholder={user?.email}
-                  value={notificationEmail}
-                  onChange={(e) => {
-                    setNotificationEmail(e.target.value);
-                    setEmailError('');
-                  }}
-                  error={emailError}
-                />
+                <div className="border-t border-charcoal/7 px-4 py-4 bg-warm-bg/40">
+                  <Input
+                    label="Send reminders to this email"
+                    type="email"
+                    placeholder={user?.email}
+                    value={notificationEmail}
+                    onChange={(e) => {
+                      setNotificationEmail(e.target.value);
+                      setEmailError('');
+                    }}
+                    error={emailError}
+                  />
+                </div>
               )}
+            </div>
 
+            {/* Save row */}
+            <div className="flex items-center gap-3 mt-5">
               {saveError && (
-                <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
-                  {saveError}
-                </p>
+                <p className="flex-1 text-[12px] text-danger">{saveError}</p>
               )}
-
-              <div className="flex items-center gap-3">
-                <Button onClick={handleSave} disabled={saving}>
+              <div className="flex items-center gap-3 ml-auto">
+                {saved && (
+                  <span className="text-[13px] font-medium text-emerald-600 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    Saved
+                  </span>
+                )}
+                <Button onClick={handleSave} disabled={saving} size="md">
                   {saving ? (
                     <>
                       <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                        />
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                       </svg>
                       Saving…
                     </>
                   ) : (
-                    'Save'
+                    'Save preferences'
                   )}
                 </Button>
-                {saved && (
-                  <span className="text-sm font-medium text-green-600">✓ Settings saved</span>
-                )}
               </div>
             </div>
           </Card>
 
-          {/* Danger Zone */}
-          <Card className="border-red-200 p-6">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-red-500">
-              Danger Zone
-            </h2>
-            <div className="flex items-center justify-between">
+          {/* ── Danger Zone ── */}
+          <Card className="p-6 border-danger/12">
+            <SectionLabel icon={LogOut}>Danger Zone</SectionLabel>
+            <div className="rounded-xl border border-danger/10 bg-danger/3 px-4 py-4 flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-900">Sign out</p>
-                <p className="text-xs text-gray-400">This will end your current session</p>
+                <p className="text-[13px] font-semibold text-charcoal">Sign out</p>
+                <p className="text-[12px] text-charcoal/38 mt-0.5">This will end your current session</p>
               </div>
               <Button
                 variant="outline"
-                className="!border-red-300 !text-red-600 hover:!bg-red-50"
+                size="sm"
+                className="!border-danger/30 !text-danger hover:!bg-danger/8 shrink-0"
                 onClick={logout}
               >
                 Sign out

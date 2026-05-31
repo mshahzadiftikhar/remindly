@@ -1,5 +1,177 @@
 @import "tailwindcss";
 
+@theme {
+  /* Backgrounds */
+  --color-warm-bg: #E8E0D0;
+  --color-warm-surface: #FDFCF9;
+
+  /* Brand */
+  --color-charcoal: #1A1A2E;
+  --color-amber-brand: #E8A838;      /* logo + primary CTA only */
+  --color-amber-brand-dark: #C8881C;
+  --color-amber-brand-light: #FDF3DC;
+
+  /* Urgency scale — only these signal status */
+  --color-urgent: #DC2626;
+  --color-urgent-bg: #FEF2F2;
+  --color-soon: #D97706;
+  --color-soon-bg: #FFFBEB;
+  --color-safe: #16A34A;
+  --color-safe-bg: #F0FDF4;
+
+  /* Neutral badge — categories (not urgency) */
+  --color-badge-bg: #EEECE8;
+  --color-badge-text: #4A4A6A;
+
+  --color-danger: #E05C5C;
+
+  /* ── Typography ── */
+  --font-display: "DM Serif Display", Georgia, serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(26,26,46,0.06), 0 4px 16px rgba(26,26,46,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(26,26,46,0.08), 0 16px 40px rgba(26,26,46,0.06);
+  --shadow-amber: 0 8px 24px rgba(232,168,56,0.28);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
+  font-family: "DM Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: #1A1A2E;
+  background: linear-gradient(160deg, #EDE5D8 0%, #E4D9C8 50%, #DDD0BA 100%);
+  min-height: 100vh;
+}
+
+.page-bg {
+  background: linear-gradient(160deg, #EDE5D8 0%, #DDD0BA 100%);
+  position: relative;
+}
+
+.page-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(26,26,46,0.045) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+/* ── Textures ─────────────────────────────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(26,26,46,0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.dot-grid-light {
+  background-image: radial-gradient(circle, rgba(26,26,46,0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dot-grid-dark {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ── Animations ───────────────────────────────────────────────────────── */
+
+/* fade-up — page entry */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+/* shimmer — skeleton loading */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(26,26,46,0.05) 0%,
+    rgba(26,26,46,0.10) 40%,
+    rgba(26,26,46,0.05) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* float — hero badges */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-7px); }
+}
+.animate-float { animation: float 3.5s ease-in-out infinite; }
+.animate-float-delayed { animation: float 3.5s ease-in-out 1.2s infinite; }
+
+/* shake — input validation error */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15%       { transform: translateX(-5px); }
+  35%       { transform: translateX(5px); }
+  55%       { transform: translateX(-4px); }
+  75%       { transform: translateX(4px); }
+  90%       { transform: translateX(-2px); }
+}
+.animate-shake { animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+/* modal-in — panel entry */
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-modal-in {
+  animation: modal-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* overlay-in — backdrop fade */
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-overlay-in { animation: overlay-in 0.2s ease forwards; }
+
+/* pulse-border — urgent card */
+@keyframes pulse-left-border {
+  0%, 100% { border-left-color: #DC2626; }
+  50%       { border-left-color: rgba(220, 38, 38, 0.2); }
+}
+.animate-pulse-border { animation: pulse-left-border 1.8s ease-in-out infinite; }
+
+/* ── Autofill — override browser's cold blue tint ────────────────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #FDF8F0 inset;
+  -webkit-text-fill-color: #1A1A2E;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* ── Typography helpers ───────────────────────────────────────────────── */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ── Glassmorphism helper ─────────────────────────────────────────────── */
+.glass {
+  background: rgba(237, 233, 225, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.glass-dark {
+  background: rgba(26, 26, 46, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }

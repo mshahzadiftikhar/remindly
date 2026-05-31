@@ -1,41 +1,59 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
-import { Button } from '../ui/Button';
 
 export function AppNavbar() {
   const { user, logout } = useAuth();
-  const displayName = user ? (user.fullName ?? user.email.split('@')[0]) : '';
+  const { pathname } = useLocation();
+  const displayName = user ? (user.fullName?.split(' ')[0] ?? user.email.split('@')[0]) : '';
+
+  const navLink = (to: string, label: string) => (
+    <Link
+      to={to}
+      className={[
+        'relative px-3.5 py-1.5 text-[13.5px] font-medium rounded-lg transition-all duration-150',
+        pathname === to
+          ? 'text-amber-brand font-semibold after:absolute after:bottom-0 after:left-3.5 after:right-3.5 after:h-[2px] after:rounded-full after:bg-amber-brand'
+          : 'text-white/60 hover:text-white hover:bg-white/8',
+      ].join(' ')}
+    >
+      {label}
+    </Link>
+  );
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-8">
-          <Link to="/dashboard" className="text-xl font-bold tracking-tight text-gray-900">
-            Remind<span className="text-indigo-600">ly</span>
+    <header className="sticky top-0 z-40 bg-charcoal">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 h-16">
+        {/* Left: logo + nav */}
+        <div className="flex items-center gap-7">
+          <Link to="/dashboard" className="flex items-center gap-2.5 group">
+            <span className="inline-flex w-[24px] h-[24px] rounded-full bg-amber-brand items-center justify-center shadow-sm shadow-amber-brand/30 group-hover:shadow-amber-brand/50 transition-shadow duration-150">
+              <span className="w-2.5 h-2.5 rounded-full bg-charcoal/80" />
+            </span>
+            <span className="font-semibold text-[17px] text-white tracking-tight">Remindly</span>
           </Link>
+
           <nav className="hidden items-center gap-1 sm:flex">
-            <Link
-              to="/dashboard"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/settings"
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-            >
-              Settings
-            </Link>
+            {navLink('/dashboard', 'Dashboard')}
+            {navLink('/settings', 'Settings')}
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Right: user + actions */}
+        <div className="flex items-center gap-1">
           {displayName && (
-            <span className="hidden text-sm text-gray-600 sm:block">{displayName}</span>
+            <>
+              <span className="hidden text-[13px] text-white/70 sm:block font-medium px-2">
+                {displayName}
+              </span>
+              <span className="hidden sm:block w-px h-4 bg-white/15 mx-1" />
+            </>
           )}
-          <Button variant="ghost" size="sm" onClick={logout}>
+          <button
+            onClick={logout}
+            className="px-3 py-1.5 text-[13px] font-medium text-white/50 hover:text-white/80 rounded-lg transition-colors duration-150"
+          >
             Sign out
-          </Button>
+          </button>
         </div>
       </div>
     </header>

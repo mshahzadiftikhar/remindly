@@ -1,7 +1,7 @@
+import { Calendar, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Reminder, ReminderCategory } from '../../lib/types';
-import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 
 interface ReminderCardProps {
@@ -10,32 +10,80 @@ interface ReminderCardProps {
   onDelete: (id: string) => Promise<void>;
 }
 
-const categoryStyle: Record<ReminderCategory, string> = {
-  document: 'text-indigo-600 bg-indigo-50',
-  subscription: 'text-purple-600 bg-purple-50',
-  warranty: 'text-orange-600 bg-orange-50',
-  insurance: 'text-green-600 bg-green-50',
-  custom: 'text-gray-600 bg-gray-100',
-};
-
-const categoryLabel: Record<ReminderCategory, string> = {
-  document: 'Document',
-  subscription: 'Subscription',
-  warranty: 'Warranty',
-  insurance: 'Insurance',
-  custom: 'Custom',
+const categoryConfig: Record<ReminderCategory, { icon: string; label: string }> = {
+  document:     { icon: '🗂️', label: 'Document' },
+  subscription: { icon: '📦', label: 'Subscription' },
+  warranty:     { icon: '🔧', label: 'Warranty' },
+  insurance:    { icon: '🛡️', label: 'Insurance' },
+  custom:       { icon: '🔔', label: 'Custom' },
 };
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  return new Date(dateStr).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function formatDaysChip(days: number): string {
-  return days === 1 ? '1 day before' : `${days} days before`;
+/* Circular progress ring — shows how close to expiry */
+const RADIUS = 28;
+const CIRC = 2 * Math.PI * RADIUS; // ≈ 175.9
+
+function ProgressRing({
+  days,
+  isExpired,
+  isUrgent,
+  isSoon,
+}: {
+  days: number;
+  isExpired: boolean;
+  isUrgent: boolean;
+  isSoon: boolean;
+}) {
+  const progress = isExpired ? 1 : Math.max(0, 1 - Math.min(days, 365) / 365);
+  const offset = CIRC * (1 - progress);
+
+  const stroke = isExpired
+    ? 'rgba(26,26,46,0.10)'
+    : isUrgent
+      ? '#DC2626'
+      : isSoon
+        ? '#D97706'
+        : '#16A34A';
+
+  const textColor = isExpired
+    ? 'text-charcoal/25'
+    : isUrgent
+      ? 'text-urgent'
+      : isSoon
+        ? 'text-soon'
+        : 'text-safe';
+
+  return (
+    <div className="relative w-[72px] h-[72px] shrink-0 flex items-center justify-center drop-shadow-sm">
+      <svg
+        width="72" height="72" viewBox="0 0 72 72"
+        style={{ transform: 'rotate(-90deg)' }}
+        className="absolute inset-0"
+      >
+        {/* Track */}
+        <circle cx="36" cy="36" r={RADIUS} fill="none" stroke="rgba(26,26,46,0.07)" strokeWidth="4" />
+        {/* Progress */}
+        <circle
+          cx="36" cy="36" r={RADIUS}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={CIRC}
+          strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 0.5s ease, stroke 0.3s ease' }}
+        />
+      </svg>
+      <div className="relative z-10 flex flex-col items-center justify-center">
+        <span className={`text-[1.9rem] font-black tabular leading-none ${textColor}`}>
+          {Math.abs(days)}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCardProps) {
@@ -44,99 +92,125 @@ export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCa
   const [deleting, setDeleting] = useState(false);
 
   const isExpired = daysUntilExpiry < 0;
-  const isUrgent = daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
-  const isSoon = daysUntilExpiry > 7 && daysUntilExpiry <= 30;
+  const isUrgent  = daysUntilExpiry >= 0 && daysUntilExpiry <= 7;
+  const isSoon    = daysUntilExpiry > 7  && daysUntilExpiry <= 30;
 
-  const daysText =
-    daysUntilExpiry < 0
-      ? `${Math.abs(daysUntilExpiry)} day${Math.abs(daysUntilExpiry) !== 1 ? 's' : ''} ago`
-      : daysUntilExpiry === 0
-        ? 'today'
-        : `in ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''}`;
-
-  const daysColor = isUrgent
-    ? 'text-red-600'
-    : isSoon
-      ? 'text-amber-600'
-      : 'text-emerald-600';
+  const cat = categoryConfig[reminder.category];
+  const sortedDays = [...reminder.remindDaysBefore].sort((a, b) => b - a);
 
   const handleDelete = async () => {
     setDeleting(true);
-    try {
-      await onDelete(reminder.id);
-    } finally {
-      setDeleting(false);
-      setConfirmOpen(false);
-    }
+    try { await onDelete(reminder.id); }
+    finally { setDeleting(false); setConfirmOpen(false); }
   };
 
-  const sortedDays = [...reminder.remindDaysBefore].sort((a, b) => b - a);
+  const urgencyBorder = isExpired
+    ? 'border-l-charcoal/20'
+    : isUrgent
+      ? 'border-l-urgent'
+      : isSoon
+        ? 'border-l-soon'
+        : 'border-l-safe';
 
   return (
     <>
-      <div className={`rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-200 hover:shadow-md ${isExpired ? 'opacity-60' : ''}`}>
-        <div className="p-5">
-          {/* Row 1: category + status */}
-          <div className="mb-4 flex items-center justify-between">
-            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${categoryStyle[reminder.category]}`}>
-              {categoryLabel[reminder.category]}
-            </span>
-            <span className={`flex items-center gap-1.5 text-xs font-medium ${isExpired ? 'text-gray-400' : 'text-emerald-600'}`}>
-              <span className={`inline-block h-1.5 w-1.5 rounded-full ${isExpired ? 'bg-gray-300' : 'bg-emerald-500'}`} />
-              {isExpired ? 'Expired' : 'Active'}
-            </span>
+      <div
+        className={[
+          'group flex flex-col rounded-2xl border border-[#D4C9B8] bg-[#FEFCF8] overflow-hidden',
+          'shadow-[0_2px_8px_rgba(100,80,40,0.10),_0_8px_32px_rgba(100,80,40,0.08)] transition-all duration-200',
+          'hover:-translate-y-1 hover:shadow-[0_4px_20px_rgba(100,80,40,0.15),_0_16px_48px_rgba(100,80,40,0.10)] hover:border-[#C4B5A0]',
+          'border-l-4', urgencyBorder,
+          isExpired ? 'opacity-55' : '',
+          isUrgent && reminder.isActive ? 'animate-pulse-border' : '',
+        ].join(' ')}
+      >
+        <div className="flex flex-col flex-1 p-5">
+          {/* Header row: title + category badge */}
+          <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[1.1rem] leading-none">{cat.icon}</span>
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full text-badge-text bg-badge-bg">
+                  {cat.label}
+                </span>
+              </div>
+              <h3 className="font-semibold text-[15px] leading-snug mt-2 truncate text-charcoal">
+                {reminder.title}
+              </h3>
+            </div>
+
+            {/* Expired stamp or urgency status dot */}
+            {isExpired ? (
+              <span className="shrink-0 text-[10px] font-bold tracking-wide text-charcoal/40 bg-charcoal/8 border border-charcoal/12 px-2 py-0.5 rounded-full mt-0.5">
+                EXPIRED
+              </span>
+            ) : (
+              <span
+                className={`shrink-0 w-2 h-2 rounded-full mt-1 ${isUrgent ? 'bg-urgent' : isSoon ? 'bg-soon' : 'bg-safe'}`}
+                title={isUrgent ? 'Urgent' : isSoon ? 'Soon' : 'Active'}
+              />
+            )}
           </div>
 
-          {/* Row 2: title */}
-          <h3 className="mb-1 truncate text-base font-semibold text-gray-900">
-            {isUrgent && reminder.isActive && (
-              <span className="mr-1.5 inline-block h-2 w-2 animate-pulse rounded-full bg-red-500 align-middle" />
-            )}
-            {reminder.title}
-          </h3>
-
-          {/* Row 3: expiry */}
-          <p className="mb-4 text-sm text-gray-500">
-            Expires{' '}
-            <span className={`font-medium ${daysColor}`}>{daysText}</span>
-            {' · '}
-            {formatDate(reminder.expiryDate)}
-          </p>
-
-          {/* Row 4: remind-before chips */}
-          {sortedDays.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {sortedDays.map((d) => (
-                <span key={d} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">
-                  {formatDaysChip(d)}
-                </span>
-              ))}
+          {/* Days ring + meta */}
+          <div className="flex items-center gap-4 mb-5">
+            <ProgressRing
+              days={daysUntilExpiry}
+              isExpired={isExpired}
+              isUrgent={isUrgent}
+              isSoon={isSoon}
+            />
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-charcoal/32 mb-0.5">
+                {isExpired ? 'Expired' : 'Days remaining'}
+              </p>
+              <p className="text-[11px] text-charcoal/35">{isExpired ? 'ago' : 'until expiry'}</p>
+              <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-charcoal/38">
+                <Calendar size={10} className="shrink-0" />
+                <span>{formatDate(reminder.expiryDate)}</span>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Reminder chips */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-auto">
+            {sortedDays.slice(0, 3).map((d) => (
+              <span
+                key={d}
+                className="rounded-full bg-charcoal/5 border border-charcoal/10 px-3 py-1 text-[11px] font-medium text-charcoal/55"
+              >
+                {d === 1 ? '1 day' : `${d} days`} before
+              </span>
+            ))}
+            {sortedDays.length > 3 && (
+              <span className="text-[10px] text-charcoal/32">+{sortedDays.length - 3}</span>
+            )}
+          </div>
 
           {/* Notes */}
           {reminder.notes && (
-            <p className="mt-3 truncate text-xs text-gray-400">{reminder.notes}</p>
+            <p className="mt-3 truncate text-[11px] text-charcoal/30 italic leading-snug">
+              {reminder.notes}
+            </p>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-1 border-t border-gray-100 px-5 py-3">
-          <Button
-            variant="ghost"
-            size="sm"
+        {/* Footer actions — always visible on mobile, hover-only on desktop */}
+        <div className="flex items-center justify-end gap-0.5 border-t border-charcoal/6 px-3 py-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
+          <button
             onClick={() => navigate(`/reminders/${reminder.id}`)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-charcoal/40 hover:text-charcoal hover:bg-charcoal/5 transition-all duration-150"
           >
+            <Pencil size={12} />
             Edit
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="!text-red-500 hover:!bg-red-50"
+          </button>
+          <button
             onClick={() => setConfirmOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-charcoal/40 hover:text-danger hover:bg-danger/7 transition-all duration-150"
           >
+            <Trash2 size={12} />
             Delete
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -148,7 +222,7 @@ export function ReminderCard({ reminder, daysUntilExpiry, onDelete }: ReminderCa
         onConfirm={handleDelete}
         onClose={() => setConfirmOpen(false)}
       >
-        Are you sure you want to delete <strong>{reminder.title}</strong>? This cannot be undone.
+        Are you sure you want to delete <strong>{reminder.title}</strong>? This action cannot be undone.
       </Modal>
     </>
   );
