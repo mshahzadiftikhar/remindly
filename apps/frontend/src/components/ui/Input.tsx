@@ -25,12 +25,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             type={resolvedType}
             className={[
               'w-full rounded-xl border px-4 py-2.5 text-sm text-charcoal',
-              'placeholder-charcoal/28 outline-none bg-white',
+              'placeholder-charcoal/28 outline-none bg-stone-50',
               'transition-all duration-150',
               error
-                ? 'border-danger focus:border-danger focus:ring-2 focus:ring-danger/18 bg-danger/3'
-                : 'border-charcoal/14 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15',
-              'disabled:bg-warm-bg disabled:text-charcoal/40 disabled:cursor-not-allowed',
+                ? 'border-danger focus:border-danger focus:ring-2 focus:ring-danger/18 bg-danger/6'
+                : 'border-charcoal/15 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15',
+              'disabled:bg-stone-100 disabled:text-charcoal/30 disabled:cursor-not-allowed',
               isPassword ? 'pr-[3rem]' : '',
               className,
             ].join(' ')}

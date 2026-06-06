@@ -8,7 +8,9 @@ import { LandingPage } from '../pages/LandingPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { ComingSoonPage } from '../pages/ComingSoonPage';
+import { ForgotPasswordPage } from '../pages/auth/ForgotPasswordPage';
 import { LoginPage } from '../pages/auth/LoginPage';
+import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
 import { SignupPage } from '../pages/auth/SignupPage';
 import { EditReminderPage } from '../pages/reminders/EditReminderPage';
 import { NewReminderPage } from '../pages/reminders/NewReminderPage';
@@ -35,6 +37,22 @@ export function App() {
                 element={
                   <PublicRoute>
                     <LoginPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/auth/forgot-password"
+                element={
+                  <PublicRoute>
+                    <ForgotPasswordPage />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/auth/reset-password"
+                element={
+                  <PublicRoute>
+                    <ResetPasswordPage />
                   </PublicRoute>
                 }
               />

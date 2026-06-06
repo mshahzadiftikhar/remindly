@@ -1,3 +1,4 @@
+import { Bell } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../lib/auth-context';
 
@@ -25,11 +26,11 @@ export function AppNavbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 h-16">
         {/* Left: logo + nav */}
         <div className="flex items-center gap-7">
-          <Link to="/dashboard" className="flex items-center gap-2.5 group">
-            <span className="inline-flex w-[24px] h-[24px] rounded-full bg-amber-brand items-center justify-center shadow-sm shadow-amber-brand/30 group-hover:shadow-amber-brand/50 transition-shadow duration-150">
-              <span className="w-2.5 h-2.5 rounded-full bg-charcoal/80" />
-            </span>
-            <span className="font-semibold text-[17px] text-white tracking-tight">Remindly</span>
+          <Link to="/dashboard" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-amber-brand flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)] shrink-0">
+              <Bell size={13} className="text-charcoal" strokeWidth={2.5} />
+            </div>
+            <span className="text-[17px] font-bold tracking-tight text-white">Remindly</span>
           </Link>
 
           <nav className="hidden items-center gap-1 sm:flex">

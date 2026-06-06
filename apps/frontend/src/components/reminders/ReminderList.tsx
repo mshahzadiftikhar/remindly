@@ -30,11 +30,10 @@ interface SectionProps {
 
 function Section({ label, dotColor, count, items, onDelete, indexOffset }: SectionProps) {
   if (items.length === 0) return null;
-  const isUrgentSection = label === 'Urgent';
   return (
     <div>
       <div className="mb-4 flex items-center gap-2.5">
-        <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${dotColor} ${isUrgentSection ? 'animate-pulse' : ''}`} />
+        <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${dotColor}`} />
         <h2 className="text-[13px] font-semibold text-white/50 uppercase tracking-widest">{label}</h2>
         <span className="rounded-full bg-white/8 px-2 py-0.5 text-[11px] font-medium text-white/45">
           {count}

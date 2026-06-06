@@ -1,3 +1,4 @@
+import { Bell } from 'lucide-react';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -14,10 +15,10 @@ export function AuthLayout({ children }: AuthLayoutProps) {
 
       {/* Logo */}
       <Link to="/" className="relative z-10 flex items-center gap-2.5 mb-8">
-        <span className="inline-flex w-7 h-7 rounded-full bg-amber-brand items-center justify-center shadow-lg shadow-amber-brand/30">
-          <span className="w-2.5 h-2.5 rounded-full bg-charcoal/80" />
-        </span>
-        <span className="font-display text-xl text-white tracking-tight">Remindly</span>
+        <div className="w-8 h-8 rounded-full bg-amber-brand flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.15)] shrink-0">
+          <Bell size={13} className="text-charcoal" strokeWidth={2.5} />
+        </div>
+        <span className="text-[17px] font-bold tracking-tight text-white">Remindly</span>
       </Link>
 
       <div className="relative z-10 w-full max-w-[440px]">

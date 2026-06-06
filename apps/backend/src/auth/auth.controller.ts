@@ -12,8 +12,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -46,6 +48,18 @@ export class AuthController {
     const token = this.authService.signToken({ id: profile.id, email: profile.email } as User);
     res.cookie('access_token', token, COOKIE_OPTIONS);
     return profile;
+  }
+
+  @Post('forgot-password')
+  @HttpCode(200)
+  forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto);
+  }
+
+  @Post('reset-password')
+  @HttpCode(200)
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   @Post('logout')

@@ -245,7 +245,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
               placeholder="Any additional details…"
               value={form.notes}
               onChange={(e) => set('notes', e.target.value)}
-              className="w-full resize-none rounded-xl border border-charcoal/14 px-4 py-2.5 text-sm text-charcoal placeholder-charcoal/28 outline-none transition-all duration-150 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15 bg-white disabled:bg-warm-bg disabled:text-charcoal/40"
+              className="w-full resize-none rounded-xl border border-white/12 px-4 py-2.5 text-sm text-white placeholder-white/28 outline-none transition-all duration-150 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15 bg-white/8 disabled:bg-white/4 disabled:text-white/30"
             />
           </div>
 

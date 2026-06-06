@@ -20,7 +20,6 @@ interface StatCardProps {
   label: string;
   value: number;
   Icon: React.ElementType;
-  gradient: string;
   valueColor: string;
   iconBg: string;
   iconColor: string;
@@ -28,9 +27,9 @@ interface StatCardProps {
   trend?: string;
 }
 
-function StatCard({ label, value, Icon, gradient, valueColor, iconBg, iconColor, bottomBorder, trend }: StatCardProps) {
+function StatCard({ label, value, Icon, valueColor, iconBg, iconColor, bottomBorder, trend }: StatCardProps) {
   return (
-    <div className={`relative rounded-2xl border border-white/8 shadow-[0_2px_16px_rgba(0,0,0,0.25)] ${gradient} p-5 overflow-hidden flex flex-col`}>
+    <div className={`relative rounded-2xl border border-white/8 bg-[#1E2035] shadow-[0_2px_8px_rgba(0,0,0,0.25)] p-5 overflow-hidden flex flex-col`}>
       <div className="flex items-start justify-between mb-4">
         <div className={`h-10 w-10 rounded-xl ${iconBg} flex items-center justify-center`}>
           <Icon size={17} className={iconColor} />
@@ -55,7 +54,7 @@ function getContextMessage(reminders: Reminder[]): { text: string; color: string
   }
   const urgent = reminders.filter(r => { const d = getDaysUntil(r.expiryDate); return d >= 0 && d <= 7; }).length;
   const soon = reminders.filter(r => { const d = getDaysUntil(r.expiryDate); return d > 7 && d <= 30; }).length;
-  if (urgent > 0) return { text: `${urgent} reminder${urgent > 1 ? 's' : ''} expire${urgent === 1 ? 's' : ''} within a week — action needed.`, color: 'text-urgent font-medium' };
+  if (urgent > 0) return { text: `${urgent} reminder${urgent > 1 ? 's' : ''} expire${urgent === 1 ? 's' : ''} within a week — action needed.`, color: 'text-[#FCA5A5] font-medium' };
   if (soon > 0) return { text: `${soon} reminder${soon > 1 ? 's' : ''} coming up this month.`, color: 'text-soon font-medium' };
   return { text: "All looking good. Nothing urgent right now.", color: 'text-safe' };
 }
@@ -90,22 +89,19 @@ function DashboardContent() {
     {
       key: 'total', label: 'Total reminders', value: reminders.length,
       Icon: ClipboardList,
-      gradient: 'bg-white/5',
-      valueColor: 'text-white', iconBg: 'bg-white/10', iconColor: 'text-white/45',
+      valueColor: 'text-white', iconBg: 'bg-white/8', iconColor: 'text-white/50',
       bottomBorder: 'bg-white/20',
     },
     {
       key: 'expiring', label: 'Expiring this month', value: expiringThisMonth,
       Icon: Clock,
-      gradient: 'bg-amber-brand/8',
-      valueColor: 'text-soon', iconBg: 'bg-soon/15', iconColor: 'text-soon',
-      bottomBorder: 'bg-soon',
+      valueColor: 'text-amber-brand', iconBg: 'bg-amber-brand/12', iconColor: 'text-amber-brand',
+      bottomBorder: 'bg-amber-brand',
     },
     {
       key: 'active', label: 'Active', value: reminders.filter(r => r.isActive).length,
       Icon: CheckCircle,
-      gradient: 'bg-emerald-500/8',
-      valueColor: 'text-safe', iconBg: 'bg-safe/15', iconColor: 'text-safe',
+      valueColor: 'text-safe', iconBg: 'bg-safe/12', iconColor: 'text-safe',
       bottomBorder: 'bg-safe',
     },
   ];
@@ -121,7 +117,7 @@ function DashboardContent() {
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-[1.85rem] text-white leading-snug font-semibold">
-              Hello, <span className="font-display">{firstName}</span> 👋
+              Hello, <span className="font-display">{firstName}</span>
             </h1>
             <p className={`mt-1 text-[13px] font-medium ${ctx.color} transition-colors duration-300`}>
               {loading ? 'Loading your reminders…' : ctx.text}

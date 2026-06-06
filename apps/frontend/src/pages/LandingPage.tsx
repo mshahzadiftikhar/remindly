@@ -179,8 +179,8 @@ export function LandingPage() {
                     Email sent
                   </div>
                   {/* Bottom badge */}
-                  <div className="animate-float-delayed absolute -bottom-5 -left-5 flex items-center gap-1.5 bg-white/10 border border-white/18 text-white text-[11px] font-semibold px-3.5 py-2 rounded-full shadow-lg backdrop-blur-sm">
-                    <Bell size={11} className="text-amber-brand" />
+                  <div className="absolute -bottom-5 -left-5 flex items-center gap-1.5 bg-white border border-charcoal/10 text-charcoal text-xs font-medium px-3.5 py-2 rounded-full shadow-lg shadow-charcoal/15 animate-float-delayed">
+                    <Bell size={12} className="text-amber-brand" />
                     Reminder scheduled
                   </div>
                 </div>

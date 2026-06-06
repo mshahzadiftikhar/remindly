@@ -1,17 +1,21 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -91,6 +95,32 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.users.findOne({ where: { email: dto.email } });
+    if (user && user.passwordHash) {
+      const token = crypto.randomBytes(32).toString('hex');
+      user.resetPasswordToken = token;
+      user.resetPasswordExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      await this.users.save(user);
+      const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
+      this.logger.log(`Password reset link: ${frontendUrl}/auth/reset-password?token=${token}`);
+    }
+    return { message: 'If an account with that email exists, a reset link has been sent.' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.users.findOne({ where: { resetPasswordToken: dto.token } });
+    if (!user || !user.resetPasswordExpiresAt || user.resetPasswordExpiresAt < new Date()) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+    user.passwordHash = await bcrypt.hash(dto.password, 12);
+    user.resetPasswordToken = null;
+    user.resetPasswordExpiresAt = null;
+    await this.users.save(user);
+    this.logger.log(`Password reset successful for: ${user.email}`);
+    return { message: 'Password updated successfully' };
   }
 
   signToken(user: User) {
