@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -78,8 +79,22 @@ export class AuthController {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     };
+  }
+
+  @Get('verify-email')
+  @HttpCode(200)
+  verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
+  @Post('resend-verification')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  resendVerification(@Req() req: Request & { user: User }) {
+    return this.authService.resendVerification(req.user.id);
   }
 
   @Get('google')

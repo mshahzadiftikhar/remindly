@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EmailModule } from '../email/email.module';
 import { User } from '../users/entities/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -19,6 +20,7 @@ if (process.env.MICROSOFT_CLIENT_ID) oauthProviders.push(MicrosoftStrategy);
     TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({}),
+    EmailModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, ...oauthProviders],

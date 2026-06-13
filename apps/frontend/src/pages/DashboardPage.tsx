@@ -1,4 +1,4 @@
-import { ClipboardList, Clock, CheckCircle, Plus, TrendingUp } from 'lucide-react';
+import { ClipboardList, Clock, CheckCircle, Plus, TrendingUp, Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppNavbar } from '../components/layout/AppNavbar';
@@ -57,6 +57,43 @@ function getContextMessage(reminders: Reminder[]): { text: string; color: string
   if (urgent > 0) return { text: `${urgent} reminder${urgent > 1 ? 's' : ''} expire${urgent === 1 ? 's' : ''} within a week — action needed.`, color: 'text-[#FCA5A5] font-medium' };
   if (soon > 0) return { text: `${soon} reminder${soon > 1 ? 's' : ''} coming up this month.`, color: 'text-soon font-medium' };
   return { text: "All looking good. Nothing urgent right now.", color: 'text-safe' };
+}
+
+function VerificationBanner() {
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const resend = async () => {
+    setSending(true);
+    try {
+      await api.post('/auth/resend-verification');
+      setSent(true);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="flex items-start gap-3 rounded-xl border border-amber-brand/30 bg-amber-brand/8 px-4 py-3.5 mb-6">
+      <Mail size={16} className="text-amber-brand shrink-0 mt-0.5" />
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] text-white/80 leading-snug">
+          <span className="font-semibold text-white">Verify your email</span> to receive reminder notifications.
+        </p>
+      </div>
+      {sent ? (
+        <span className="text-[12px] text-amber-brand shrink-0">Sent!</span>
+      ) : (
+        <button
+          onClick={resend}
+          disabled={sending}
+          className="text-[12px] font-semibold text-amber-brand hover:text-amber-brand-dark transition-colors shrink-0 disabled:opacity-50"
+        >
+          {sending ? 'Sending…' : 'Resend email'}
+        </button>
+      )}
+    </div>
+  );
 }
 
 function DashboardContent() {
@@ -132,6 +169,8 @@ function DashboardContent() {
             New reminder
           </Button>
         </div>
+
+        {user && !user.emailVerified && <VerificationBanner />}
 
         {loading ? (
           <DashboardSkeleton />

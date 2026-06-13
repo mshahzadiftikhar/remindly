@@ -12,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { EmailService } from '../email/email.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -25,6 +26,7 @@ export class AuthService {
     @InjectRepository(User) private readonly users: Repository<User>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly email: EmailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -40,8 +42,15 @@ export class AuthService {
       passwordHash,
       fullName: dto.fullName ?? null,
     });
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    user.emailVerificationToken = verificationToken;
     await this.users.save(user);
     this.logger.log(`User registered: ${user.email} (id: ${user.id})`);
+
+    const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
+    const verifyUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`;
+    await this.email.sendVerificationEmail(user.email, verifyUrl);
+
     return this.toProfile(user);
   }
 
@@ -97,6 +106,32 @@ export class AuthService {
     return user;
   }
 
+  async verifyEmail(token: string) {
+    const user = await this.users.findOne({ where: { emailVerificationToken: token } });
+    if (!user) {
+      throw new BadRequestException('Invalid or expired verification link');
+    }
+    user.emailVerified = true;
+    user.emailVerificationToken = null;
+    await this.users.save(user);
+    this.logger.log(`Email verified for: ${user.email}`);
+    return { message: 'Email verified successfully' };
+  }
+
+  async resendVerification(userId: string) {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user || user.emailVerified) return;
+
+    const token = crypto.randomBytes(32).toString('hex');
+    user.emailVerificationToken = token;
+    await this.users.save(user);
+
+    const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
+    const verifyUrl = `${frontendUrl}/auth/verify-email?token=${token}`;
+    await this.email.sendVerificationEmail(user.email, verifyUrl);
+    this.logger.log(`Verification email resent to: ${user.email}`);
+  }
+
   async forgotPassword(dto: ForgotPasswordDto) {
     const user = await this.users.findOne({ where: { email: dto.email } });
     if (user && user.passwordHash) {
@@ -105,7 +140,8 @@ export class AuthService {
       user.resetPasswordExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
       await this.users.save(user);
       const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
-      this.logger.log(`Password reset link: ${frontendUrl}/auth/reset-password?token=${token}`);
+      const resetUrl = `${frontendUrl}/auth/reset-password?token=${token}`;
+      await this.email.sendPasswordReset(user.email, resetUrl);
     }
     return { message: 'If an account with that email exists, a reset link has been sent.' };
   }
@@ -138,6 +174,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      emailVerified: user.emailVerified,
       createdAt: user.createdAt,
     };
   }

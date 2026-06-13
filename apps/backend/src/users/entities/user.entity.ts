@@ -30,6 +30,12 @@ export class User {
   @Column({ name: 'full_name', type: 'varchar', length: 100, nullable: true })
   fullName!: string | null;
 
+  @Column({ name: 'email_verified', type: 'boolean', default: false })
+  emailVerified!: boolean;
+
+  @Column({ name: 'email_verification_token', type: 'varchar', nullable: true })
+  emailVerificationToken!: string | null;
+
   @Column({ name: 'reset_password_token', type: 'varchar', nullable: true })
   resetPasswordToken!: string | null;
 

@@ -39,9 +39,8 @@ export class NotificationsService {
       .createQueryBuilder('r')
       .innerJoinAndSelect('r.user', 'u')
       .where('r.is_active = true')
-      .andWhere(
-        "r.expiry_date - CURRENT_DATE = ANY(r.remind_days_before)",
-      )
+      .andWhere("r.expiry_date - CURRENT_DATE = ANY(r.remind_days_before)")
+      .andWhere('u.email_verified = true')
       .getMany();
 
     let emailsSent = 0;

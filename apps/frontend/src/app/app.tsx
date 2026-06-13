@@ -12,6 +12,7 @@ import { ForgotPasswordPage } from '../pages/auth/ForgotPasswordPage';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
 import { SignupPage } from '../pages/auth/SignupPage';
+import { VerifyEmailPage } from '../pages/auth/VerifyEmailPage';
 import { EditReminderPage } from '../pages/reminders/EditReminderPage';
 import { NewReminderPage } from '../pages/reminders/NewReminderPage';
 
@@ -56,6 +57,7 @@ export function App() {
                   </PublicRoute>
                 }
               />
+              <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/reminders/new" element={<NewReminderPage />} />
               <Route path="/reminders/:id" element={<EditReminderPage />} />
