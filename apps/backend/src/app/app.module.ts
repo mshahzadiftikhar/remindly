@@ -25,6 +25,7 @@ import { User } from '../users/entities/user.entity';
         database: config.get('DB_DATABASE', 'remindly'),
         entities: [User, Reminder, UserSettings],
         synchronize: true, // dev only — replace with migrations before production
+        ssl: config.get('DB_SSL') === 'true' ? { rejectUnauthorized: false } : false,
       }),
     }),
     AuthModule,
