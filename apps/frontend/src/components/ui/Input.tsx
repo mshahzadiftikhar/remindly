@@ -4,10 +4,11 @@ import { forwardRef, InputHTMLAttributes, useState } from 'react';
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  variant?: 'light' | 'dark';
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, id, className = '', type, ...props }, ref) => {
+  ({ label, error, id, className = '', type, variant = 'light', ...props }, ref) => {
     const inputId = id ?? label.toLowerCase().replace(/\s+/g, '-');
     const isPassword = type === 'password';
     const [showPw, setShowPw] = useState(false);
@@ -15,7 +16,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className={`flex flex-col gap-1.5 ${error ? 'animate-shake' : ''}`}>
-        <label htmlFor={inputId} className="text-[13px] font-medium text-charcoal/65">
+        <label
+          htmlFor={inputId}
+          className={`text-[13px] font-medium ${variant === 'dark' ? 'text-white/65' : 'text-charcoal/65'}`}
+        >
           {label}
         </label>
         <div className="relative">
@@ -24,13 +28,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             type={resolvedType}
             className={[
-              'w-full rounded-xl border px-4 py-2.5 text-sm text-charcoal',
-              'placeholder-charcoal/28 outline-none bg-stone-50',
-              'transition-all duration-150',
+              'w-full rounded-xl border px-4 py-2.5 text-sm',
+              'outline-none transition-all duration-150',
+              variant === 'dark'
+                ? 'text-white placeholder-white/28 bg-white/8 [color-scheme:dark]'
+                : 'text-charcoal placeholder-charcoal/28 bg-stone-50',
               error
                 ? 'border-danger focus:border-danger focus:ring-2 focus:ring-danger/18 bg-danger/6'
-                : 'border-charcoal/15 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15',
-              'disabled:bg-stone-100 disabled:text-charcoal/30 disabled:cursor-not-allowed',
+                : variant === 'dark'
+                  ? 'border-white/12 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15'
+                  : 'border-charcoal/15 focus:border-amber-brand focus:ring-2 focus:ring-amber-brand/15',
+              variant === 'dark'
+                ? 'disabled:bg-white/4 disabled:text-white/30 disabled:cursor-not-allowed'
+                : 'disabled:bg-stone-100 disabled:text-charcoal/30 disabled:cursor-not-allowed',
               isPassword ? 'pr-[3rem]' : '',
               className,
             ].join(' ')}

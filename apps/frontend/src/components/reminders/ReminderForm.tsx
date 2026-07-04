@@ -146,6 +146,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
           {/* Title */}
           <Input
             label="Title"
+            variant="dark"
             placeholder="e.g. UK Passport"
             maxLength={101}
             value={form.title}
@@ -190,6 +191,7 @@ export function ReminderForm({ reminder }: ReminderFormProps) {
           {/* Expiry Date */}
           <Input
             label="Expiry date"
+            variant="dark"
             type="date"
             min={todayISO()}
             value={form.expiryDate}
