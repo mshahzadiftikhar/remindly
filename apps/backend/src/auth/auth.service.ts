@@ -48,7 +48,7 @@ export class AuthService {
     this.logger.log(`User registered: ${user.email} (id: ${user.id})`);
 
     const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
-    const verifyUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`;
+    const verifyUrl = `${frontendUrl}/#/auth/verify-email?token=${verificationToken}`;
     await this.email.sendVerificationEmail(user.email, verifyUrl);
 
     return this.toProfile(user);
@@ -127,7 +127,7 @@ export class AuthService {
     await this.users.save(user);
 
     const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
-    const verifyUrl = `${frontendUrl}/auth/verify-email?token=${token}`;
+    const verifyUrl = `${frontendUrl}/#/auth/verify-email?token=${token}`;
     await this.email.sendVerificationEmail(user.email, verifyUrl);
     this.logger.log(`Verification email resent to: ${user.email}`);
   }
@@ -140,7 +140,7 @@ export class AuthService {
       user.resetPasswordExpiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
       await this.users.save(user);
       const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
-      const resetUrl = `${frontendUrl}/auth/reset-password?token=${token}`;
+      const resetUrl = `${frontendUrl}/#/auth/reset-password?token=${token}`;
       await this.email.sendPasswordReset(user.email, resetUrl);
     }
     return { message: 'If an account with that email exists, a reset link has been sent.' };

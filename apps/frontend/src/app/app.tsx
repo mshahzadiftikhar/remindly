@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import { ErrorBoundary } from '../components/layout/ErrorBoundary';
 import { PublicRoute } from '../components/layout/PublicRoute';
 import { ToastProvider } from '../components/ui/Toast';
@@ -18,7 +18,7 @@ import { NewReminderPage } from '../pages/reminders/NewReminderPage';
 
 export function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <ErrorBoundary>
         <AuthProvider>
           <ToastProvider>
@@ -67,7 +67,7 @@ export function App() {
           </ToastProvider>
         </AuthProvider>
       </ErrorBoundary>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

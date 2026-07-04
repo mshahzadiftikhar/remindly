@@ -133,7 +133,7 @@ export class NotificationsService {
               <p style="margin:0 0 28px;font-size:14px;color:rgba(26,26,46,0.5);">This item ${urgencyText}.</p>
 
               <!-- CTA -->
-              <a href="${process.env.FRONTEND_URL ?? 'http://localhost:4200'}/dashboard"
+              <a href="${process.env.FRONTEND_URL ?? 'http://localhost:4200'}/#/dashboard"
                  style="display:inline-block;background:#E8A838;color:#1A1A2E;font-size:14px;font-weight:600;text-decoration:none;padding:12px 28px;border-radius:10px;">
                 View in Remindly →
               </a>
@@ -145,7 +145,7 @@ export class NotificationsService {
             <td style="padding-top:24px;text-align:center;">
               <p style="margin:0;font-size:12px;color:rgba(26,26,46,0.35);">
                 You're receiving this because you set a reminder in Remindly.<br/>
-                <a href="${process.env.FRONTEND_URL ?? 'http://localhost:4200'}/settings" style="color:rgba(26,26,46,0.35);">Manage notification settings</a>
+                <a href="${process.env.FRONTEND_URL ?? 'http://localhost:4200'}/#/settings" style="color:rgba(26,26,46,0.35);">Manage notification settings</a>
               </p>
             </td>
           </tr>

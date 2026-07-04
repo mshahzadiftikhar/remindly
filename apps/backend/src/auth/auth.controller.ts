@@ -106,7 +106,7 @@ export class AuthController {
   googleCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
     const token = this.authService.signToken(req.user);
     res.cookie('access_token', token, COOKIE_OPTIONS);
-    res.redirect(`${FRONTEND_URL}/dashboard`);
+    res.redirect(`${FRONTEND_URL}/#/dashboard`);
   }
 
   @Get('microsoft')
@@ -118,6 +118,6 @@ export class AuthController {
   microsoftCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
     const token = this.authService.signToken(req.user);
     res.cookie('access_token', token, COOKIE_OPTIONS);
-    res.redirect(`${FRONTEND_URL}/dashboard`);
+    res.redirect(`${FRONTEND_URL}/#/dashboard`);
   }
 }
