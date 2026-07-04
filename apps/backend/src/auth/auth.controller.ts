@@ -23,7 +23,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: (isProduction ? 'none' : 'strict') as 'none' | 'strict',
+  sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
   secure: isProduction,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
