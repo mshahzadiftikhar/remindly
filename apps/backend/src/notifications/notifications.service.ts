@@ -28,13 +28,11 @@ export class NotificationsService {
 
   @Cron(CronExpression.EVERY_DAY_AT_8AM)
   async runDailyCheck() {
-    this.logger.log('Running daily reminder check...');
-    const count = await this.sendDueReminders();
-    this.logger.log(`Daily check complete — ${count} email(s) sent`);
-    return count;
+    return this.sendDueReminders();
   }
 
   async sendDueReminders(): Promise<number> {
+    this.logger.log('Running daily reminder check...');
     const due = await this.reminders
       .createQueryBuilder('r')
       .innerJoinAndSelect('r.user', 'u')
@@ -56,6 +54,7 @@ export class NotificationsService {
       emailsSent++;
     }
 
+    this.logger.log(`Daily check complete — ${emailsSent} email(s) sent`);
     return emailsSent;
   }
 
