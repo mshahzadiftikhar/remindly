@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  Post,
-  Query,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { User } from '../users/entities/user.entity';
@@ -19,15 +9,6 @@ import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
-const isProduction = process.env.NODE_ENV === 'production';
-
-const COOKIE_OPTIONS = {
-  httpOnly: true,
-  sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
-  secure: isProduction,
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-};
-
 const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:4200';
 
 @Controller('auth')
@@ -35,20 +16,18 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+  async register(@Body() dto: RegisterDto) {
     const profile = await this.authService.register(dto);
-    const token = this.authService.signToken({ id: profile.id, email: profile.email } as User);
-    res.cookie('access_token', token, COOKIE_OPTIONS);
-    return profile;
+    const accessToken = this.authService.signToken({ id: profile.id, email: profile.email } as User);
+    return { ...profile, accessToken };
   }
 
   @Post('login')
   @HttpCode(200)
-  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+  async login(@Body() dto: LoginDto) {
     const profile = await this.authService.login(dto);
-    const token = this.authService.signToken({ id: profile.id, email: profile.email } as User);
-    res.cookie('access_token', token, COOKIE_OPTIONS);
-    return profile;
+    const accessToken = this.authService.signToken({ id: profile.id, email: profile.email } as User);
+    return { ...profile, accessToken };
   }
 
   @Post('forgot-password')
@@ -66,8 +45,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
-  logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('access_token');
+  logout() {
     return { message: 'Logged out' };
   }
 
@@ -104,9 +82,8 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
-    const token = this.authService.signToken(req.user);
-    res.cookie('access_token', token, COOKIE_OPTIONS);
-    res.redirect(`${FRONTEND_URL}/#/dashboard`);
+    const accessToken = this.authService.signToken(req.user);
+    res.redirect(`${FRONTEND_URL}/#/auth/oauth-callback?token=${accessToken}`);
   }
 
   @Get('microsoft')
@@ -116,8 +93,7 @@ export class AuthController {
   @Get('microsoft/callback')
   @UseGuards(AuthGuard('microsoft'))
   microsoftCallback(@Req() req: Request & { user: User }, @Res() res: Response) {
-    const token = this.authService.signToken(req.user);
-    res.cookie('access_token', token, COOKIE_OPTIONS);
-    res.redirect(`${FRONTEND_URL}/#/dashboard`);
+    const accessToken = this.authService.signToken(req.user);
+    res.redirect(`${FRONTEND_URL}/#/auth/oauth-callback?token=${accessToken}`);
   }
 }

@@ -8,6 +8,10 @@ import api from '../../lib/api';
 import { useAuth } from '../../lib/auth-context';
 import { User } from '../../lib/types';
 
+interface LoginResponse extends User {
+  accessToken: string;
+}
+
 interface FormState { email: string; password: string; }
 interface FormErrors { email?: string; password?: string; }
 
@@ -21,7 +25,7 @@ function validate(values: FormState): FormErrors {
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { login } = useAuth();
   const [values, setValues] = useState<FormState>({ email: '', password: '' });
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState('');
@@ -40,9 +44,12 @@ export function LoginPage() {
     setIsSubmitting(true);
     setServerError('');
     try {
-      await api.post('/auth/login', { email: values.email, password: values.password });
-      const { data } = await api.get<User>('/auth/me');
-      setUser(data);
+      const { data } = await api.post<LoginResponse>('/auth/login', {
+        email: values.email,
+        password: values.password,
+      });
+      const { accessToken, ...user } = data;
+      login(accessToken, user);
       navigate('/dashboard');
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {

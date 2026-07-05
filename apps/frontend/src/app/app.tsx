@@ -10,6 +10,7 @@ import { SettingsPage } from '../pages/SettingsPage';
 import { ComingSoonPage } from '../pages/ComingSoonPage';
 import { ForgotPasswordPage } from '../pages/auth/ForgotPasswordPage';
 import { LoginPage } from '../pages/auth/LoginPage';
+import { OAuthCallbackPage } from '../pages/auth/OAuthCallbackPage';
 import { ResetPasswordPage } from '../pages/auth/ResetPasswordPage';
 import { SignupPage } from '../pages/auth/SignupPage';
 import { VerifyEmailPage } from '../pages/auth/VerifyEmailPage';
@@ -58,6 +59,7 @@ export function App() {
                 }
               />
               <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/auth/oauth-callback" element={<OAuthCallbackPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/reminders/new" element={<NewReminderPage />} />
               <Route path="/reminders/:id" element={<EditReminderPage />} />

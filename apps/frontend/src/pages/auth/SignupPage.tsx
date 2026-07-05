@@ -8,6 +8,10 @@ import api from '../../lib/api';
 import { useAuth } from '../../lib/auth-context';
 import { User } from '../../lib/types';
 
+interface RegisterResponse extends User {
+  accessToken: string;
+}
+
 interface FormState {
   fullName: string;
   email: string;
@@ -35,7 +39,7 @@ function validate(values: FormState): FormErrors {
 
 export function SignupPage() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { login } = useAuth();
   const [values, setValues] = useState<FormState>({ fullName: '', email: '', password: '', confirmPassword: '' });
   const [errors, setErrors] = useState<FormErrors>({});
   const [serverError, setServerError] = useState('');
@@ -54,9 +58,13 @@ export function SignupPage() {
     setIsSubmitting(true);
     setServerError('');
     try {
-      await api.post('/auth/register', { fullName: values.fullName, email: values.email, password: values.password });
-      const { data } = await api.get<User>('/auth/me');
-      setUser(data);
+      const { data } = await api.post<RegisterResponse>('/auth/register', {
+        fullName: values.fullName,
+        email: values.email,
+        password: values.password,
+      });
+      const { accessToken, ...user } = data;
+      login(accessToken, user);
       navigate('/dashboard');
     } catch (err) {
       if (axios.isAxiosError(err)) {
