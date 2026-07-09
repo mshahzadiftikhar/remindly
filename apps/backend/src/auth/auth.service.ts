@@ -49,7 +49,13 @@ export class AuthService {
 
     const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
     const verifyUrl = `${frontendUrl}/#/auth/verify-email?token=${verificationToken}`;
-    await this.email.sendVerificationEmail(user.email, verifyUrl);
+    try {
+      await this.email.sendVerificationEmail(user.email, verifyUrl);
+    } catch (err) {
+      this.logger.warn(
+        `Verification email failed to send for ${user.email}, account created anyway: ${(err as Error).message}`,
+      );
+    }
 
     return this.toProfile(user);
   }
@@ -128,8 +134,12 @@ export class AuthService {
 
     const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
     const verifyUrl = `${frontendUrl}/#/auth/verify-email?token=${token}`;
-    await this.email.sendVerificationEmail(user.email, verifyUrl);
-    this.logger.log(`Verification email resent to: ${user.email}`);
+    try {
+      await this.email.sendVerificationEmail(user.email, verifyUrl);
+      this.logger.log(`Verification email resent to: ${user.email}`);
+    } catch (err) {
+      this.logger.warn(`Failed to resend verification email to ${user.email}: ${(err as Error).message}`);
+    }
   }
 
   async forgotPassword(dto: ForgotPasswordDto) {
@@ -141,7 +151,11 @@ export class AuthService {
       await this.users.save(user);
       const frontendUrl = this.config.get('FRONTEND_URL', 'http://localhost:4200');
       const resetUrl = `${frontendUrl}/#/auth/reset-password?token=${token}`;
-      await this.email.sendPasswordReset(user.email, resetUrl);
+      try {
+        await this.email.sendPasswordReset(user.email, resetUrl);
+      } catch (err) {
+        this.logger.warn(`Failed to send password reset email to ${user.email}: ${(err as Error).message}`);
+      }
     }
     return { message: 'If an account with that email exists, a reset link has been sent.' };
   }
